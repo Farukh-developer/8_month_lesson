@@ -8,5 +8,6 @@ class Car(models.Model):
     year=models.DateField()
     
     def __str__(self):
+    
         return f'{self.name}'
     
