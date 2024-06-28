@@ -1,150 +1,164 @@
 from django.shortcuts import render
-from rest_framework.generics import ListAPIView, RetrieveAPIView
-from .models import Service, Hotel, Travel
-from .serializers import ServiceSerializer, HotelSerializer, TravelSerializer
+from rest_framework.generics import  RetrieveAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView, GenericAPIView, ListAPIView
+from .models import Service, Hotel, Travel, Category, Product, Retreview
+from .serializers import ServiceSerializer, HotelSerializer, TravelSerializer, CategorySerializer, ProductSerializer, RetreviewSerializer
+from rest_framework import mixins
 from rest_framework.views import APIView
-from django.forms import model_to_dict
 from rest_framework.request import Request
 
 from rest_framework.response import Response
 
 
-class ServiceAPIView(APIView):
-    def get(self, request: Request, pk = None):
-        if pk:
-            try:
-                service=Service.objects.get(pk=pk)
-                return Response(ServiceSerializer(service).data)   
-            except: 
-                return Response({'message':'data not found'})
-            
-        service=Service.objects.all()
-        return Response({'service':ServiceSerializer(service, many=True).data})
+class ListCreateServiceAPIView(mixins.ListModelMixin,
+                        mixins.CreateModelMixin,
+                        GenericAPIView):
+    queruset = Service.objects.all()
+    serializer_class=ServiceSerializer
     
-    def post(self, request: Request):
-        serializer=ServiceSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        service=serializer.save()
-        return Response(ServiceSerializer(service).data)
-    
-        
-    def put(self, request: Request, pk: int = None):
-        if not pk:
-            return Response({'message':'PUT methos is not allowed'})
-        try:
-            service=Service.objects.get(pk=pk)
-            serializer=ServiceSerializer(instance=service, data=request.data)
-            serializer.is_valid(raise_exception=True)
-            updated_service=serializer.save()
-            return Response(ServiceSerializer(updated_service).data)
-        except:
-            return Response({'message':'data not found'})
-            
-        
-    
-    def delete(self, request: Request, pk: int = None):
-        if not pk:
-            return Response({'message':'Delete methos is not allowed'})
-        try:
-            service=Service.objects.get(pk=pk)
-            service.delete()
-            return Response({"message":"Removed by you"})
-        except:
-            return Response({'message':'data not found'})
-        
-        
-##################### 2
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
-class HotelAPIView(APIView):
-    def get(self, request: Request, pk = None):
-        if pk:
-            try:
-                hotel=Hotel.objects.get(pk=pk)
-                return Response(HotelSerializer(hotel).data)   
-            except: 
-                return Response({'message':'data not found'})
-            
-        hotel=Hotel.objects.all()
-        return Response({'hotel':HotelSerializer(hotel, many=True).data})
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
     
-    def post(self, request: Request):
-        serializer=HotelSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        hotel=serializer.save()
-        return Response(HotelSerializer(hotel).data)
     
-        
-    def put(self, request: Request, pk: int = None):
-        if not pk:
-            return Response({'message':'PUT methos is not allowed'})
-        try:
-            hotel=Hotel.objects.get(pk=pk)
-            serializer=HotelSerializer(instance=hotel, data=request.data)
-            serializer.is_valid(raise_exception=True)
-            updated_hotel=serializer.save()
-            return Response(HotelSerializer(updated_hotel).data)
-        except:
-            return Response({'message':'data not found'})
-            
-        
     
-    def delete(self, request: Request, pk: int = None):
-        if not pk:
-            return Response({'message':'Delete methos is not allowed'})
-        try:
-            hotel=Hotel.objects.get(pk=pk)
-            hotel.delete()
-            return Response({"message":"Removed by you"})
-        except:
-            return Response({'message':'data not found'})
-        
-        
-##################### 3
+class RetrieveServiceUpdateDestroyAPIView(mixins.RetrieveModelMixin,
+                                   mixins.UpdateModelMixin,
+                                   mixins.DestroyModelMixin,
+                                   GenericAPIView):
+    queryset=Service.objects.all()
+    serializer_class=ServiceSerializer
+    
+    
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+    
+################################################################## 2
 
 
-class TravelAPIView(APIView):
-    def get(self, request: Request, pk = None):
-        if pk:
-            try:
-                travel=Travel.objects.get(pk=pk)
-                return Response(TravelSerializer(travel).data)   
-            except: 
-                return Response({'message':'data not found'})
-            
-        travel=Travel.objects.all()
-        return Response({'travel':TravelSerializer(travel, many=True).data})
+
+class ListCreateHotelAPIView(mixins.ListModelMixin,
+                        mixins.CreateModelMixin,
+                        GenericAPIView):
+    queryset = Hotel.objects.all()
+    serializer_class=HotelSerializer
+    
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
     
     
-    def post(self, request: Request):
-        serializer=TravelSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        travel=serializer.save()
-        return Response(TravelSerializer(travel).data)
     
+class RetrieveHotelUpdateDestroyAPIView(mixins.RetrieveModelMixin,
+                                   mixins.UpdateModelMixin,
+                                   mixins.DestroyModelMixin,
+                                   GenericAPIView):
+    queryset=Hotel.objects.all()
+    serializer_class=HotelSerializer
+    
+    
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)    
+    
+    
+################################################# 3
+
+class ListCreateTravelAPIView(mixins.ListModelMixin,
+                        mixins.CreateModelMixin,
+                        GenericAPIView):
+    queruset = Travel.objects.all()
+    serializer_class=TravelSerializer
+    
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+    
+    
+    
+class RetrieveTravelUpdateDestroyAPIView(mixins.RetrieveModelMixin,
+                                   mixins.UpdateModelMixin,
+                                   mixins.DestroyModelMixin,
+                                   GenericAPIView):
+    queryset=Travel.objects.all()
+    serializer_class=TravelSerializer
+    
+    
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)        
+    
+    
+    
+    
+############################################ View in generic views methods
+    
+class ListCategoryAPIView(ListCreateAPIView):
+    queryset=Category.objects.all()
+    serializer_class=CategorySerializer
+    
+    
+class ListUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
+    queryset=Category.objects.all()
+    serializer_class=CategorySerializer
+    
+###################################### 2
+
+
+class ListProductAPIView(ListCreateAPIView):
+    queryset=Product.objects.all()
+    serializer_class=CategorySerializer
+    
+    
+class ListUpdateProductDestroyAPIView(RetrieveUpdateDestroyAPIView):
+    queryset=Product.objects.all()
+    serializer_class=ProductSerializer
+    
+    
+#################################### 3
+
+
+
+class ListRetriewCreateAPIView(ListCreateAPIView):
+    queryset=Retreview.objects.all()
+    serializer_class=RetreviewSerializer
+    
+    
+class ListUpdateRetriewDestroyAPIView(RetrieveUpdateDestroyAPIView):
+    queryset=Retreview.objects.all()
+    serializer_class=RetreviewSerializer
+    
+    
+    
+       
         
-    def put(self, request: Request, pk: int = None):
-        if not pk:
-            return Response({'message':'PUT methos is not allowed'})
-        try:
-            travel=Travel.objects.get(pk=pk)
-            serializer=TravelSerializer(instance=travel, data=request.data)
-            serializer.is_valid(raise_exception=True)
-            updated_travel=serializer.save()
-            return Response(TravelSerializer(updated_travel).data)
-        except:
-            return Response({'message':'data not found'})
-            
-        
-    
-    def delete(self, request: Request, pk: int = None):
-        if not pk:
-            return Response({'message':'Delete methos is not allowed'})
-        try:
-            travel=Travel.objects.get(pk=pk)
-            travel.delete()
-            return Response({"message":"Removed by you"})
-        except:
-            return Response({'message':'data not found'})
-        
-        
-    
